@@ -274,6 +274,12 @@ const state = {
   b: { result: 1, target: new THREE.Quaternion(), revealQ: new THREE.Quaternion(), base: new THREE.Vector3(1.2, 0.45, 0.35) }
 };
 
+// Mobile-friendly base positions
+const DESKTOP_A_BASE = new THREE.Vector3(-1.2, 0.45, -0.35);
+const DESKTOP_B_BASE = new THREE.Vector3(1.2, 0.45, 0.35);
+const MOBILE_A_BASE = new THREE.Vector3(-0.7, 0.45, -0.2);
+const MOBILE_B_BASE = new THREE.Vector3(0.7, 0.45, 0.2);
+
 function syncUI() {
   ui.bankroll.textContent = fmtNrp(state.bankroll);
 }
@@ -610,7 +616,23 @@ function resize() {
   const pr = Math.min(window.devicePixelRatio || 1, 2);
   renderer.setPixelRatio(pr);
   renderer.setSize(rect.width, rect.height, false);
-  camera.aspect = rect.width / rect.height;
+  
+  const aspect = rect.width / rect.height;
+  camera.aspect = aspect;
+
+  // Adjust FOV and Camera position for mobile portrait
+  if (aspect < 0.8) {
+    camera.fov = 60; // Wider FOV for vertical screens
+    camera.position.set(0, 11, 12);
+    state.a.base.copy(MOBILE_A_BASE);
+    state.b.base.copy(MOBILE_B_BASE);
+  } else {
+    camera.fov = 46;
+    camera.position.set(0, 9.6, 10.8);
+    state.a.base.copy(DESKTOP_A_BASE);
+    state.b.base.copy(DESKTOP_B_BASE);
+  }
+  
   camera.updateProjectionMatrix();
 }
 window.addEventListener("resize", resize);
