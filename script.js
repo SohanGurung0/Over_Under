@@ -483,10 +483,35 @@ function finishRoll(now) {
 }
 
 ui.startBtn.addEventListener("click", () => showScreen("game"));
-ui.quitBtn.addEventListener("click", () => showNotify("Thanks for playing! You can close this tab."));
 ui.shopBtn.addEventListener("click", () => showScreen("shop"));
 ui.backBtn.addEventListener("click", () => showScreen("home"));
 ui.exitToHomeBtn.addEventListener("click", () => showScreen("home"));
+
+const quitBtn = document.getElementById('quitBtn');
+if (quitBtn) {
+    // Remove existing event listeners
+    const newQuitBtn = quitBtn.cloneNode(true);
+    quitBtn.parentNode.replaceChild(newQuitBtn, quitBtn);
+    
+    newQuitBtn.addEventListener('click', function() {
+        // Show styled notification
+        showNotify("Thanks for playing! Closing window in 5 seconds... ", "info");
+        
+        setTimeout(() => {
+            showNotify("Closing window now... ", "info");
+            
+            setTimeout(() => {
+                window.close();
+                
+                setTimeout(() => {
+                    if (!window.closed) {
+                        showNotify("Unable to close window. Browser restrictions apply. You can manually close this tab.", "lose");
+                    }
+                }, 100);
+            }, 2000);
+        }, 3000); // 4 seconds delay
+    });
+}
 
 ui.rechargeBtn.addEventListener("click", () => {
   const amount = Number(ui.rechargeInput.value);
