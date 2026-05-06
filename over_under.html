@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Higher or Lower</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+  <div id="wrap">
+    <div id="loseVignette"></div>
+    <div class="toast-container" id="toastContainer"></div>
+
+    <section id="homeScreen" class="screen">
+      <div class="corner-hud">
+        <button id="shopBtn">Shop</button>
+      </div>
+      <div class="home-bg-table"></div>
+      <div class="home-card">
+        <h1 class="home-title">Higher or Lower</h1>
+        <p class="home-sub">Guess Higher, Lower, or Exactly 7.</p>
+        <div class="home-actions">
+          <button id="startBtn">Start Game</button>
+          <button id="quitBtn">Quit</button>
+        </div>
+      </div>
+    </section>
+
+    <section id="gameScreen" class="screen hidden">
+      <section id="panel">
+        <canvas id="sceneCanvas"></canvas>
+        <div class="roll-history">
+          <div id="rollHistory" class="roll-track"> None </div>
+        </div>
+        <div class="controls">
+          <label for="betInput">Bet</label>
+          <input id="betInput" type="number" min="300" value="300" />
+          <button id="guessHigherBtn" class="guess-btn">Guess Higher</button>
+          <button id="guessLowerBtn" class="guess-btn">Guess Lower</button>
+          <button id="guessSevenBtn" class="guess-btn">Guess Exactly 7</button>
+          <button id="resetBtn">Reset</button>
+        </div>
+        <div id="guessModal" class="modal hidden">
+          <div class="modal-card">
+            <h3 id="modalTitle">Confirm Guess</h3>
+            <p id="modalBody">Roll with this guess?</p>
+            <div class="bet-row">
+              <label for="modalBetInput">Bet Amount</label>
+              <input id="modalBetInput" type="number" min="300" value="300" />
+            </div>
+            <div class="modal-actions">
+              <button id="modalCancelBtn">Cancel</button>
+              <button id="modalRollBtn">Roll</button>
+            </div>
+          </div>
+        </div>
+      </section>
+    </section>
+
+    <section id="shopScreen" class="screen hidden">
+      <div class="shop-card">
+        <h2>Shop - Recharge Cash</h2>
+        <p>Add money to your total cash balance.</p>
+        <div class="shop-actions">
+          <input id="rechargeInput" type="number" min="1" value="1000" />
+          <button id="rechargeBtn">Recharge</button>
+          <button id="backBtn">Back</button>
+        </div>
+      </div>
+    </section>
+
+    <div class="top-left-hud">
+      <button id="exitToHomeBtn" class="back-circle" title="Home">↩</button>
+      <div id="bankrollText"
+        style="font-size: 24px; font-weight: 800; background: #00000066; padding: 4px 16px; border-radius: 99px; backdrop-filter: blur(8px); border: 1px solid #ffffff2b;">
+        NRP 1000.00</div>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="https://unpkg.com/three@0.155.0/build/three.min.js"></script>
+  <script src="script.js"></script>
+</body>
+
+</html>
