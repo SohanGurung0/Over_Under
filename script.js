@@ -1,7 +1,12 @@
+/* ==========================================================================
+   Over Under - 3D Dice Engine, Audio Synthesizer, Stats & Game Logic
+   ========================================================================== */
+
 const MIN_BET = 300;
 const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
 const fmtNrp = (n) => `NRP ${n.toFixed(2)}`;
 
+// Cryptographically secure integer generator [min, max]
 const cryptoRandInt = (min, max) => {
   const range = max - min + 1;
   const maxUint = 0xFFFFFFFF;
@@ -15,6 +20,157 @@ const cryptoRandInt = (min, max) => {
   return min + (n % range);
 };
 
+// --------------------------------------------------------------------------
+// Sound Synthesizer via Native Web Audio API
+// --------------------------------------------------------------------------
+class SoundController {
+  constructor() {
+    this.ctx = null;
+    this.enabled = localStorage.getItem("over_under_sound") !== "false";
+  }
+
+  initContext() {
+    if (!this.ctx && typeof AudioContext !== "undefined") {
+      const AudioCtx = window.AudioContext || window.webkitAudioContext;
+      this.ctx = new AudioCtx();
+    }
+    if (this.ctx && this.ctx.state === "suspended") {
+      this.ctx.resume();
+    }
+  }
+
+  toggle() {
+    this.enabled = !this.enabled;
+    localStorage.setItem("over_under_sound", String(this.enabled));
+    return this.enabled;
+  }
+
+  playRoll() {
+    if (!this.enabled) return;
+    this.initContext();
+    if (!this.ctx) return;
+    const now = this.ctx.currentTime;
+    for (let i = 0; i < 4; i++) {
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+      osc.type = "sine";
+      osc.frequency.setValueAtTime(200 + Math.random() * 260, now + i * 0.08);
+      gain.gain.setValueAtTime(0.08, now + i * 0.08);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + i * 0.08 + 0.05);
+      osc.connect(gain);
+      gain.connect(this.ctx.destination);
+      osc.start(now + i * 0.08);
+      osc.stop(now + i * 0.08 + 0.06);
+    }
+  }
+
+  playWin() {
+    if (!this.enabled) return;
+    this.initContext();
+    if (!this.ctx) return;
+    const now = this.ctx.currentTime;
+    const notes = [440, 554.37, 659.25, 880]; // A major arpeggio
+    notes.forEach((freq, idx) => {
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+      osc.type = "triangle";
+      osc.frequency.setValueAtTime(freq, now + idx * 0.09);
+      gain.gain.setValueAtTime(0.12, now + idx * 0.09);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + idx * 0.09 + 0.35);
+      osc.connect(gain);
+      gain.connect(this.ctx.destination);
+      osc.start(now + idx * 0.09);
+      osc.stop(now + idx * 0.09 + 0.4);
+    });
+  }
+
+  playPush() {
+    if (!this.enabled) return;
+    this.initContext();
+    if (!this.ctx) return;
+    const now = this.ctx.currentTime;
+    const osc = this.ctx.createOscillator();
+    const gain = this.ctx.createGain();
+    osc.type = "sine";
+    osc.frequency.setValueAtTime(523.25, now); // C5
+    osc.frequency.setValueAtTime(659.25, now + 0.12); // E5
+    gain.gain.setValueAtTime(0.1, now);
+    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.3);
+    osc.connect(gain);
+    gain.connect(this.ctx.destination);
+    osc.start(now);
+    osc.stop(now + 0.32);
+  }
+
+  playLose() {
+    if (!this.enabled) return;
+    this.initContext();
+    if (!this.ctx) return;
+    const now = this.ctx.currentTime;
+    const osc = this.ctx.createOscillator();
+    const gain = this.ctx.createGain();
+    osc.type = "sawtooth";
+    osc.frequency.setValueAtTime(220, now);
+    osc.frequency.exponentialRampToValueAtTime(110, now + 0.3);
+    gain.gain.setValueAtTime(0.09, now);
+    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.32);
+    osc.connect(gain);
+    gain.connect(this.ctx.destination);
+    osc.start(now);
+    osc.stop(now + 0.35);
+  }
+}
+
+const sounds = new SoundController();
+
+// --------------------------------------------------------------------------
+// Player Statistics & Progression (localStorage)
+// --------------------------------------------------------------------------
+class GameStats {
+  constructor() {
+    const raw = localStorage.getItem("over_under_player_stats");
+    let parsed = null;
+    if (raw) {
+      try { parsed = JSON.parse(raw); } catch (e) { parsed = null; }
+    }
+    this.data = parsed || { streak: 0, bestStreak: 0, totalRolls: 0, wins: 0 };
+    this.updateHUD();
+  }
+
+  save() {
+    localStorage.setItem("over_under_player_stats", JSON.stringify(this.data));
+    this.updateHUD();
+  }
+
+  recordRoll(outcome) { // "win", "lose", "push"
+    this.data.totalRolls++;
+    if (outcome === "win") {
+      this.data.wins++;
+      this.data.streak++;
+      if (this.data.streak > this.data.bestStreak) {
+        this.data.bestStreak = this.data.streak;
+      }
+    } else if (outcome === "lose") {
+      this.data.streak = 0;
+    }
+    this.save();
+  }
+
+  updateHUD() {
+    const streakEl = document.getElementById("statStreak");
+    const bestEl = document.getElementById("statBestStreak");
+    const rollsEl = document.getElementById("statTotalRolls");
+    if (streakEl) streakEl.textContent = String(this.data.streak);
+    if (bestEl) bestEl.textContent = String(this.data.bestStreak);
+    if (rollsEl) rollsEl.textContent = String(this.data.totalRolls);
+  }
+}
+
+const stats = new GameStats();
+
+// --------------------------------------------------------------------------
+// Three.js 3D Scene Setup
+// --------------------------------------------------------------------------
 const canvas = document.getElementById("sceneCanvas");
 const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
 renderer.shadowMap.enabled = true;
@@ -37,10 +193,12 @@ keyLight.shadow.camera.right = 10;
 keyLight.shadow.camera.top = 10;
 keyLight.shadow.camera.bottom = -10;
 scene.add(keyLight);
+
 const rim = new THREE.PointLight(0x58c8ff, 0.33, 25);
 rim.position.set(-6, 5, -6);
 scene.add(rim);
 
+// Casino Table Felt & Rails
 const table = { halfW: 4.9, halfH: 2.45, rail: 0.34, pocketR: 0.24 };
 const felt = new THREE.Mesh(
   new THREE.BoxGeometry(table.halfW * 2, 0.2, table.halfH * 2),
@@ -60,6 +218,7 @@ function addRail(w, h, d, x, z) {
   rail.receiveShadow = true;
   scene.add(rail);
 }
+
 const outerW = table.halfW * 2 + table.rail * 2;
 const outerH = table.halfH * 2 + table.rail * 2;
 addRail(outerW, 0.5, table.rail, 0, table.halfH + table.rail / 2);
@@ -111,6 +270,7 @@ black8.castShadow = true;
 black8.receiveShadow = true;
 scene.add(black8);
 
+// Dice Texture Generator
 function dieFaceTexture(n) {
   const c = document.createElement("canvas");
   c.width = c.height = 256;
@@ -183,9 +343,6 @@ function topValueFromMesh(mesh) {
 function buildOrientationsByTop() {
   const byTop = { 1: [], 2: [], 3: [], 4: [], 5: [], 6: [] };
   const seen = new Set();
-  const up = new THREE.Vector3(0, 1, 0);
-  const forward = new THREE.Vector3(0, 0, 1);
-
   for (let xi = 0; xi < 4; xi++) {
     for (let yi = 0; yi < 4; yi++) {
       for (let zi = 0; zi < 4; zi++) {
@@ -197,7 +354,6 @@ function buildOrientationsByTop() {
         const key = `${q.x.toFixed(3)}|${q.y.toFixed(3)}|${q.z.toFixed(3)}|${q.w.toFixed(3)}`;
         if (seen.has(key)) continue;
         seen.add(key);
-
         const top = topValueFromQuaternion(q);
         byTop[top].push(q.clone());
       }
@@ -208,26 +364,27 @@ function buildOrientationsByTop() {
     const list = byTop[i];
     list.sort((qa, qb) => {
       const localUp = [
-        new THREE.Vector3(0, 1, 0), // face 1 (+X)
-        new THREE.Vector3(0, 1, 0), // face 6 (-X)
-        new THREE.Vector3(0, 0, -1),// face 2 (+Y)
-        new THREE.Vector3(0, 0, 1), // face 5 (-Y)
-        new THREE.Vector3(0, 1, 0), // face 3 (+Z)
-        new THREE.Vector3(0, 1, 0)  // face 4 (-Z)
+        new THREE.Vector3(0, 1, 0),
+        new THREE.Vector3(0, 1, 0),
+        new THREE.Vector3(0, 0, -1),
+        new THREE.Vector3(0, 0, 1),
+        new THREE.Vector3(0, 1, 0),
+        new THREE.Vector3(0, 1, 0)
       ][i === 1 ? 0 : i === 6 ? 1 : i === 2 ? 2 : i === 5 ? 3 : i === 3 ? 4 : 5];
-
       const worldUpA = localUp.clone().applyQuaternion(qa);
       const worldUpB = localUp.clone().applyQuaternion(qb);
       return worldUpA.z - worldUpB.z;
     });
     byTop[i] = [list[0]];
   }
-
   return byTop;
 }
 
 const ORIENTATIONS_BY_TOP = buildOrientationsByTop();
 
+// --------------------------------------------------------------------------
+// UI & State Management
+// --------------------------------------------------------------------------
 const ui = {
   homeScreen: document.getElementById("homeScreen"),
   gameScreen: document.getElementById("gameScreen"),
@@ -251,7 +408,10 @@ const ui = {
   rechargeBtn: document.getElementById("rechargeBtn"),
   backBtn: document.getElementById("backBtn"),
   exitToHomeBtn: document.getElementById("exitToHomeBtn"),
-  shopBtn: document.getElementById("shopBtn")
+  shopBtn: document.getElementById("shopBtn"),
+  soundToggleBtn: document.getElementById("soundToggleBtn"),
+  heroPlayNowBtn: document.getElementById("heroPlayNowBtn"),
+  navPlayBtn: document.getElementById("navPlayBtn")
 };
 
 const state = {
@@ -274,18 +434,18 @@ const state = {
   b: { result: 1, target: new THREE.Quaternion(), revealQ: new THREE.Quaternion(), base: new THREE.Vector3(1.2, 0.45, 0.35) }
 };
 
-// Mobile-friendly base positions
 const DESKTOP_A_BASE = new THREE.Vector3(-1.2, 0.45, -0.35);
 const DESKTOP_B_BASE = new THREE.Vector3(1.2, 0.45, 0.35);
 const MOBILE_A_BASE = new THREE.Vector3(-0.7, 0.45, -0.2);
 const MOBILE_B_BASE = new THREE.Vector3(0.7, 0.45, 0.2);
 
 function syncUI() {
-  ui.bankroll.textContent = fmtNrp(state.bankroll);
+  if (ui.bankroll) ui.bankroll.textContent = fmtNrp(state.bankroll);
 }
 
 function showNotify(msg, type = "info") {
   const c = document.getElementById("toastContainer");
+  if (!c) return;
   const t = document.createElement("div");
   t.className = `toast ${type}`;
   t.textContent = msg;
@@ -320,17 +480,18 @@ function triggerConfetti() {
 
 function triggerLoseEffect() {
   const v = document.getElementById("loseVignette");
+  if (!v) return;
   v.classList.add("active");
   setTimeout(() => v.classList.remove("active"), 2500);
 }
 
 function showScreen(name) {
-  ui.homeScreen.classList.add("hidden");
-  ui.gameScreen.classList.add("hidden");
-  ui.shopScreen.classList.add("hidden");
-  if (name === "home") ui.homeScreen.classList.remove("hidden");
-  if (name === "game") ui.gameScreen.classList.remove("hidden");
-  if (name === "shop") ui.shopScreen.classList.remove("hidden");
+  if (ui.homeScreen) ui.homeScreen.classList.add("hidden");
+  if (ui.gameScreen) ui.gameScreen.classList.add("hidden");
+  if (ui.shopScreen) ui.shopScreen.classList.add("hidden");
+  if (name === "home" && ui.homeScreen) ui.homeScreen.classList.remove("hidden");
+  if (name === "game" && ui.gameScreen) ui.gameScreen.classList.remove("hidden");
+  if (name === "shop" && ui.shopScreen) ui.shopScreen.classList.remove("hidden");
   resize();
 }
 
@@ -351,20 +512,20 @@ function openGuessModal(guess) {
 
 function closeGuessModal() {
   state.pendingGuess = null;
-  ui.guessModal.classList.add("hidden");
+  if (ui.guessModal) ui.guessModal.classList.add("hidden");
 }
 
 function validateBet(bet) {
   if (!Number.isFinite(bet) || bet <= 0) {
-    alert("Enter a valid positive bet.");
+    showNotify("Enter a valid positive bet.", "lose");
     return false;
   }
   if (bet < MIN_BET) {
-    alert(`Minimum bet is NRP ${MIN_BET}.`);
+    showNotify(`Minimum bet is NRP ${MIN_BET}.`, "lose");
     return false;
   }
   if (bet > state.bankroll) {
-    alert("Insufficient bankroll.");
+    showNotify("Insufficient virtual bankroll. Please recharge in the Shop.", "lose");
     return false;
   }
   return true;
@@ -383,12 +544,13 @@ function startReveal(now) {
 }
 
 function renderRollHistory() {
+  if (!ui.rollHistory) return;
   if (!state.rollHistory.length) {
     ui.rollHistory.textContent = "-";
     return;
   }
   ui.rollHistory.innerHTML = state.rollHistory.map((r) =>
-    `<span class="roll-pill ${r.correct ? "win" : "lose"}">${r.sum}</span>`
+    `<span class="roll-pill ${r.outcome}">${r.sum}</span>`
   ).join("");
   ui.rollHistory.scrollLeft = 0;
 }
@@ -399,7 +561,7 @@ function resetRound() {
   state.reveal.active = false;
   state.rollHistory = [];
   renderRollHistory();
-  ui.betInput.value = String(MIN_BET);
+  if (ui.betInput) ui.betInput.value = String(MIN_BET);
   closeGuessModal();
   dieA.position.copy(state.a.base);
   dieB.position.copy(state.b.base);
@@ -441,6 +603,7 @@ function startRoll(guess, bet) {
 
   state.rolling = true;
   state.rollStart = performance.now();
+  sounds.playRoll();
   return true;
 }
 
@@ -451,97 +614,148 @@ function finishRoll(now) {
   const die2 = topValueFromMesh(dieB);
   const sum = die1 + die2;
   let payout = 0;
-  let correctGuess = false;
+  let outcome = "lose";
+
   if (state.guess === "higher") {
     if (sum > 7) {
       payout = bet * 2;
-      correctGuess = true;
+      outcome = "win";
+    } else if (sum === 7) {
+      payout = bet;
+      outcome = "push";
     }
-    else if (sum === 7) payout = bet;
   } else if (state.guess === "lower") {
     if (sum < 7) {
       payout = bet * 2;
-      correctGuess = true;
+      outcome = "win";
+    } else if (sum === 7) {
+      payout = bet;
+      outcome = "push";
     }
-    else if (sum === 7) payout = bet;
   } else if (sum === 7) {
     payout = bet * 4;
-    correctGuess = true;
+    outcome = "win";
   }
 
   state.bankroll += payout;
   syncUI();
-  state.rollHistory.unshift({ sum, correct: correctGuess });
+  state.rollHistory.unshift({ sum, outcome });
   renderRollHistory();
 
+  // Record outcome in stats
+  stats.recordRoll(outcome);
+
   const net = payout - bet;
-  if (net > 0) {
+  if (outcome === "win") {
     const mult = state.guess === "seven" ? "4x" : "2x";
-    showNotify(`WIN! +${fmtNrp(net).replace("NRP ", "NRP ")} (${mult} payout)`, "win");
+    showNotify(`WIN! +${fmtNrp(net)} (${mult} payout)`, "win");
+    sounds.playWin();
     triggerConfetti();
-  } else if (net === 0) {
-    showNotify("PUSH! You guessed Higher/Lower and rolled 7, stake returned.", "info");
+  } else if (outcome === "push") {
+    showNotify("PUSH! You guessed Higher/Lower and rolled 7. Full stake returned!", "info");
+    sounds.playPush();
   } else {
-    showNotify(`LOSE. -${fmtNrp(Math.abs(net)).replace("NRP ", "NRP ")}`, "lose");
+    showNotify(`LOSE. -${fmtNrp(Math.abs(net))}`, "lose");
+    sounds.playLose();
     triggerLoseEffect();
   }
   startReveal(now);
 }
 
-ui.startBtn.addEventListener("click", () => showScreen("game"));
-ui.shopBtn.addEventListener("click", () => showScreen("shop"));
-ui.backBtn.addEventListener("click", () => showScreen("home"));
-ui.exitToHomeBtn.addEventListener("click", () => showScreen("home"));
+// --------------------------------------------------------------------------
+// Event Listeners & Interactive Handlers
+// --------------------------------------------------------------------------
+if (ui.startBtn) ui.startBtn.addEventListener("click", () => showScreen("game"));
+if (ui.shopBtn) ui.shopBtn.addEventListener("click", () => showScreen("shop"));
+if (ui.backBtn) ui.backBtn.addEventListener("click", () => showScreen("home"));
+if (ui.exitToHomeBtn) ui.exitToHomeBtn.addEventListener("click", () => showScreen("home"));
 
-const quitBtn = document.getElementById('quitBtn');
-if (quitBtn) {
-    // Remove existing event listeners
-    const newQuitBtn = quitBtn.cloneNode(true);
-    quitBtn.parentNode.replaceChild(newQuitBtn, quitBtn);
-    
-    newQuitBtn.addEventListener('click', function() {
-        // Show styled notification
-        showNotify("Thanks for playing! Closing window in 5 seconds... ", "info");
-        
-        setTimeout(() => {
-            showNotify("Closing window now... ", "info");
-            
-            setTimeout(() => {
-                window.close();
-                
-                setTimeout(() => {
-                    if (!window.closed) {
-                        showNotify("Unable to close window. Browser restrictions apply. You can manually close this tab.", "lose");
-                    }
-                }, 100);
-            }, 2000);
-        }, 3000); // 4 seconds delay
-    });
+// Go to Game Handlers (Header, Hero, Floating & Section Buttons)
+function scrollToGameAndStart() {
+  showScreen("game");
+  const gameSec = document.getElementById("gameArea");
+  if (gameSec) {
+    gameSec.scrollIntoView({ behavior: "smooth", block: "center" });
+  }
 }
 
-ui.rechargeBtn.addEventListener("click", () => {
-  const amount = Number(ui.rechargeInput.value);
-  if (!Number.isFinite(amount) || amount <= 0) return showNotify("Enter a valid recharge amount.", "lose");
-  state.bankroll += amount;
-  syncUI();
-  showNotify(`Recharged +${fmtNrp(amount)}`, "win");
+document.querySelectorAll(".go-to-game-trigger").forEach((btn) => {
+  btn.addEventListener("click", (e) => {
+    e.preventDefault();
+    scrollToGameAndStart();
+  });
 });
 
-ui.guessHigherBtn.addEventListener("click", () => openGuessModal("higher"));
-ui.guessLowerBtn.addEventListener("click", () => openGuessModal("lower"));
-ui.guessSevenBtn.addEventListener("click", () => openGuessModal("seven"));
-ui.modalCancelBtn.addEventListener("click", closeGuessModal);
-ui.modalRollBtn.addEventListener("click", () => {
-  const guess = state.pendingGuess;
-  const bet = Number(ui.modalBetInput.value);
-  if (!guess) return;
-  if (!validateBet(bet)) return;
-  ui.betInput.value = String(bet);
-  closeGuessModal();
-  startRoll(guess, bet);
-});
-ui.resetBtn.addEventListener("click", resetRound);
+// Floating Go to Game Button Scroll Observer
+const floatingBtn = document.getElementById("floatingGoToGameBtn");
+if (floatingBtn) {
+  window.addEventListener("scroll", () => {
+    const gameArea = document.getElementById("gameArea");
+    if (!gameArea) return;
+    const rect = gameArea.getBoundingClientRect();
+    if (rect.bottom < 150) {
+      floatingBtn.classList.add("visible");
+    } else {
+      floatingBtn.classList.remove("visible");
+    }
+  }, { passive: true });
+}
 
+// Sound Toggle
+if (ui.soundToggleBtn) {
+  const updateSoundBtn = () => {
+    ui.soundToggleBtn.textContent = sounds.enabled ? "🔊 Sound: ON" : "🔇 Sound: OFF";
+  };
+  updateSoundBtn();
+  ui.soundToggleBtn.addEventListener("click", () => {
+    sounds.toggle();
+    updateSoundBtn();
+  });
+}
+
+// Quit Button
+const quitBtn = document.getElementById("quitBtn");
+if (quitBtn) {
+  const newQuitBtn = quitBtn.cloneNode(true);
+  quitBtn.parentNode.replaceChild(newQuitBtn, quitBtn);
+  newQuitBtn.addEventListener("click", () => {
+    showNotify("Thanks for playing Over Under! You can return to play anytime.", "info");
+    setTimeout(() => {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }, 1500);
+  });
+}
+
+if (ui.rechargeBtn) {
+  ui.rechargeBtn.addEventListener("click", () => {
+    const amount = Number(ui.rechargeInput.value);
+    if (!Number.isFinite(amount) || amount <= 0) return showNotify("Enter a valid recharge amount.", "lose");
+    state.bankroll += amount;
+    syncUI();
+    showNotify(`Recharged +${fmtNrp(amount)} free credits!`, "win");
+  });
+}
+
+if (ui.guessHigherBtn) ui.guessHigherBtn.addEventListener("click", () => openGuessModal("higher"));
+if (ui.guessLowerBtn) ui.guessLowerBtn.addEventListener("click", () => openGuessModal("lower"));
+if (ui.guessSevenBtn) ui.guessSevenBtn.addEventListener("click", () => openGuessModal("seven"));
+if (ui.modalCancelBtn) ui.modalCancelBtn.addEventListener("click", closeGuessModal);
+if (ui.modalRollBtn) {
+  ui.modalRollBtn.addEventListener("click", () => {
+    const guess = state.pendingGuess;
+    const bet = Number(ui.modalBetInput.value);
+    if (!guess) return;
+    if (!validateBet(bet)) return;
+    ui.betInput.value = String(bet);
+    closeGuessModal();
+    startRoll(guess, bet);
+  });
+}
+if (ui.resetBtn) ui.resetBtn.addEventListener("click", resetRound);
+
+// --------------------------------------------------------------------------
+// 3D Animation Loop & Resize
+// --------------------------------------------------------------------------
 function animateDice(now, dt) {
   if (!state.rolling) {
     if (state.reveal.active) {
@@ -576,6 +790,7 @@ function animateDice(now, dt) {
     dieB.rotation.x += dt * 0.33;
     return;
   }
+
   const t = now - state.rollStart;
   const spinPhase = t < state.spinDuration;
   const settleT = clamp((t - state.spinDuration) / state.settleDuration, 0, 1);
@@ -611,18 +826,18 @@ function animateDice(now, dt) {
 }
 
 function resize() {
+  if (!canvas) return;
   const rect = canvas.getBoundingClientRect();
   if (!rect.width || !rect.height) return;
   const pr = Math.min(window.devicePixelRatio || 1, 2);
   renderer.setPixelRatio(pr);
   renderer.setSize(rect.width, rect.height, false);
-  
+
   const aspect = rect.width / rect.height;
   camera.aspect = aspect;
 
-  // Adjust FOV and Camera position for mobile portrait
-  if (aspect < 0.8) {
-    camera.fov = 60; // Wider FOV for vertical screens
+  if (aspect < 0.85) {
+    camera.fov = 60;
     camera.position.set(0, 11, 12);
     state.a.base.copy(MOBILE_A_BASE);
     state.b.base.copy(MOBILE_B_BASE);
@@ -632,9 +847,9 @@ function resize() {
     state.a.base.copy(DESKTOP_A_BASE);
     state.b.base.copy(DESKTOP_B_BASE);
   }
-  
   camera.updateProjectionMatrix();
 }
+
 window.addEventListener("resize", resize);
 resize();
 syncUI();
@@ -646,7 +861,7 @@ function tick(now) {
   const dt = Math.min((now - prev) / 1000, 0.033);
   prev = now;
   animateDice(now, dt);
-  black8.rotation.y += dt * 0.3;
+  if (black8) black8.rotation.y += dt * 0.3;
   renderer.render(scene, camera);
   requestAnimationFrame(tick);
 }
