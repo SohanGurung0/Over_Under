@@ -27,4 +27,4 @@ A vibrant, 3D-enhanced dice game built with Three.js. Guess if the sum of two di
 Just open `index.html` in any modern web browser. No server-side setup required.
 
 ---
-*Created with passion for a premium gaming experience.*
+by SohanGurung0
