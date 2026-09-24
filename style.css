@@ -1038,12 +1038,11 @@ button, input {
   margin: 24px 0;
   padding: 20px 24px;
   border-radius: var(--radius-md);
-  background: rgba(74, 154, 106, 0.1);
-  border: 1px solid rgba(74, 154, 106, 0.35);
+  border: 2px dashed rgba(201, 151, 77, 0.5);
 }
 
 .push-callout h4 {
-  color: var(--accent-win);
+  color: var(--text-primary);
   font-size: 1.15rem;
   font-family: var(--font-display);
   font-weight: 600;
@@ -1053,7 +1052,7 @@ button, input {
 .push-callout p {
   margin: 0;
   font-size: 0.95rem;
-  color: #d3e6d9;
+  color: var(--text-secondary);
 }
 
 /* Tables */
@@ -1141,7 +1140,7 @@ button, input {
   font-weight: 600;
   font-size: 1.1rem;
   margin-bottom: 8px;
-  color: var(--accent-brass-bright);
+  color: var(--text-primary);
 }
 
 .tip-card p {
