@@ -201,8 +201,8 @@ scene.add(rim);
 // Casino Table Felt & Rails
 const table = { halfW: 4.9, halfH: 2.45, rail: 0.34, pocketR: 0.24 };
 const felt = new THREE.Mesh(
-  new THREE.BoxGeometry(table.halfW * 2, 0.2, table.halfH * 2),
-  new THREE.MeshStandardMaterial({ color: 0x0f6837, roughness: 0.9, metalness: 0.07 })
+    new THREE.BoxGeometry(table.halfW * 2, 0.2, table.halfH * 2),
+    new THREE.MeshStandardMaterial({ color: 0x0f6837, roughness: 0.9, metalness: 0.07 })
 );
 felt.position.y = -0.1;
 felt.receiveShadow = true;
@@ -210,8 +210,8 @@ scene.add(felt);
 
 function addRail(w, h, d, x, z) {
   const rail = new THREE.Mesh(
-    new THREE.BoxGeometry(w, h, d),
-    new THREE.MeshStandardMaterial({ color: 0x5f3b1d, roughness: 0.57, metalness: 0.14 })
+      new THREE.BoxGeometry(w, h, d),
+      new THREE.MeshStandardMaterial({ color: 0x5f3b1d, roughness: 0.57, metalness: 0.14 })
   );
   rail.position.set(x, h / 2 - 0.1, z);
   rail.castShadow = true;
@@ -262,8 +262,8 @@ function make8BallTexture() {
 }
 
 const black8 = new THREE.Mesh(
-  new THREE.SphereGeometry(0.24, 36, 36),
-  new THREE.MeshStandardMaterial({ map: make8BallTexture(), roughness: 0.24, metalness: 0.18 })
+    new THREE.SphereGeometry(0.24, 36, 36),
+    new THREE.MeshStandardMaterial({ map: make8BallTexture(), roughness: 0.24, metalness: 0.18 })
 );
 black8.position.set(0, 0.24, 0);
 black8.castShadow = true;
@@ -347,9 +347,9 @@ function buildOrientationsByTop() {
     for (let yi = 0; yi < 4; yi++) {
       for (let zi = 0; zi < 4; zi++) {
         const q = new THREE.Quaternion().setFromEuler(new THREE.Euler(
-          xi * Math.PI / 2,
-          yi * Math.PI / 2,
-          zi * Math.PI / 2
+            xi * Math.PI / 2,
+            yi * Math.PI / 2,
+            zi * Math.PI / 2
         ));
         const key = `${q.x.toFixed(3)}|${q.y.toFixed(3)}|${q.z.toFixed(3)}|${q.w.toFixed(3)}`;
         if (seen.has(key)) continue;
@@ -457,7 +457,7 @@ function showNotify(msg, type = "info") {
 }
 
 function triggerConfetti() {
-  const colors = ["#ff5c75", "#27d980", "#2d8cf0", "#f59e0b", "#a855f7"];
+  const colors = ["#c9974d", "#e3b565", "#4a9a6a", "#f3ead9", "#9a3f34"];
   for (let i = 0; i < 40; i++) {
     const el = document.createElement("div");
     el.className = "confetti";
@@ -550,7 +550,7 @@ function renderRollHistory() {
     return;
   }
   ui.rollHistory.innerHTML = state.rollHistory.map((r) =>
-    `<span class="roll-pill ${r.outcome}">${r.sum}</span>`
+      `<span class="roll-pill ${r.outcome}">${r.sum}</span>`
   ).join("");
   ui.rollHistory.scrollLeft = 0;
 }
@@ -591,14 +591,14 @@ function startRoll(guess, bet) {
   state.b.target.copy(listB[cryptoRandInt(0, listB.length - 1)]);
 
   dieA.userData.spin = new THREE.Vector3(
-    (Math.random() * 2 + 2.3) * (Math.random() < 0.5 ? -1 : 1),
-    (Math.random() * 2 + 2.7) * (Math.random() < 0.5 ? -1 : 1),
-    (Math.random() * 2 + 2.3) * (Math.random() < 0.5 ? -1 : 1)
+      (Math.random() * 2 + 2.3) * (Math.random() < 0.5 ? -1 : 1),
+      (Math.random() * 2 + 2.7) * (Math.random() < 0.5 ? -1 : 1),
+      (Math.random() * 2 + 2.3) * (Math.random() < 0.5 ? -1 : 1)
   );
   dieB.userData.spin = new THREE.Vector3(
-    (Math.random() * 2 + 2.3) * (Math.random() < 0.5 ? -1 : 1),
-    (Math.random() * 2 + 2.7) * (Math.random() < 0.5 ? -1 : 1),
-    (Math.random() * 2 + 2.3) * (Math.random() < 0.5 ? -1 : 1)
+      (Math.random() * 2 + 2.3) * (Math.random() < 0.5 ? -1 : 1),
+      (Math.random() * 2 + 2.7) * (Math.random() < 0.5 ? -1 : 1),
+      (Math.random() * 2 + 2.3) * (Math.random() < 0.5 ? -1 : 1)
   );
 
   state.rolling = true;
