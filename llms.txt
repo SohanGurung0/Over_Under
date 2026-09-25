@@ -1,0 +1,16 @@
+# Over7Under
+
+> Over7Under is a free, casual 3D browser dice prediction game. Players guess whether two rolled dice will total higher than 7, lower than 7, or exactly 7, using virtual play credits with no real-money risk.
+
+## Pages
+
+- [Home / Game](https://over7under.sohangrg.me/): The main single-page application containing the interactive 3D WebGL dice game, game rules, how-to-play guide, probability odds table, tips, and an FAQ section.
+
+## Docs
+
+- [Overview](https://over7under.sohangrg.me/overview.md): Detailed overview of the game, its mechanics, payout rules, and probability breakdown.
+
+## Optional
+
+- [Sitemap](https://over7under.sohangrg.me/sitemap.xml)
+- [Robots](https://over7under.sohangrg.me/robots.txt)
