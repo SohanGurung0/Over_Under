@@ -4,7 +4,7 @@
 
 const MIN_BET = 300;
 const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
-const fmtNrp = (n) => `NRP ${n.toFixed(2)}`;
+const fmtCredits = (n) => `${Math.floor(n).toLocaleString()} credits`;
 
 // Cryptographically secure integer generator [min, max]
 const cryptoRandInt = (min, max) => {
@@ -393,17 +393,10 @@ const ui = {
   quitBtn: document.getElementById("quitBtn"),
   bankroll: document.getElementById("bankrollText"),
   rollHistory: document.getElementById("rollHistory"),
-  betInput: document.getElementById("betInput"),
   guessHigherBtn: document.getElementById("guessHigherBtn"),
   guessLowerBtn: document.getElementById("guessLowerBtn"),
   guessSevenBtn: document.getElementById("guessSevenBtn"),
   resetBtn: document.getElementById("resetBtn"),
-  guessModal: document.getElementById("guessModal"),
-  modalTitle: document.getElementById("modalTitle"),
-  modalBody: document.getElementById("modalBody"),
-  modalBetInput: document.getElementById("modalBetInput"),
-  modalCancelBtn: document.getElementById("modalCancelBtn"),
-  modalRollBtn: document.getElementById("modalRollBtn"),
   rechargeInput: document.getElementById("rechargeInput"),
   rechargeBtn: document.getElementById("rechargeBtn"),
   backBtn: document.getElementById("backBtn"),
@@ -418,6 +411,7 @@ const state = {
   bankroll: 1000,
   rolling: false,
   guess: "seven",
+  currentBet: 300,
   pendingGuess: null,
   rollHistory: [],
   reveal: {
@@ -440,7 +434,7 @@ const MOBILE_A_BASE = new THREE.Vector3(-0.7, 0.45, -0.2);
 const MOBILE_B_BASE = new THREE.Vector3(0.7, 0.45, 0.2);
 
 function syncUI() {
-  if (ui.bankroll) ui.bankroll.textContent = fmtNrp(state.bankroll);
+  if (ui.bankroll) ui.bankroll.textContent = fmtCredits(state.bankroll);
 }
 
 function showNotify(msg, type = "info") {
@@ -495,25 +489,7 @@ function showScreen(name) {
   resize();
 }
 
-function labelForGuess(guess) {
-  if (guess === "higher") return "Higher than 7";
-  if (guess === "lower") return "Lower than 7";
-  return "Exactly 7";
-}
-
-function openGuessModal(guess) {
-  if (state.rolling) return;
-  state.pendingGuess = guess;
-  ui.modalTitle.textContent = "Confirm Guess";
-  ui.modalBody.textContent = `You picked "${labelForGuess(guess)}".`;
-  ui.modalBetInput.value = ui.betInput.value || String(MIN_BET);
-  ui.guessModal.classList.remove("hidden");
-}
-
-function closeGuessModal() {
-  state.pendingGuess = null;
-  if (ui.guessModal) ui.guessModal.classList.add("hidden");
-}
+// Modal logic removed
 
 function validateBet(bet) {
   if (!Number.isFinite(bet) || bet <= 0) {
@@ -521,7 +497,7 @@ function validateBet(bet) {
     return false;
   }
   if (bet < MIN_BET) {
-    showNotify(`Minimum bet is NRP ${MIN_BET}.`, "lose");
+    showNotify(`Minimum bet is ${MIN_BET} credits.`, "lose");
     return false;
   }
   if (bet > state.bankroll) {
@@ -561,8 +537,6 @@ function resetRound() {
   state.reveal.active = false;
   state.rollHistory = [];
   renderRollHistory();
-  if (ui.betInput) ui.betInput.value = String(MIN_BET);
-  closeGuessModal();
   dieA.position.copy(state.a.base);
   dieB.position.copy(state.b.base);
   dieA.rotation.set(0.4, 0.8, 0.2);
@@ -580,6 +554,7 @@ function startRoll(guess, bet) {
   if (!validateBet(bet)) return false;
   state.reveal.active = false;
   state.guess = guess;
+  state.currentBet = bet;
   state.bankroll -= bet;
   syncUI();
 
@@ -609,7 +584,7 @@ function startRoll(guess, bet) {
 
 function finishRoll(now) {
   state.rolling = false;
-  const bet = Number(ui.betInput.value) || 0;
+  const bet = state.currentBet || MIN_BET;
   const die1 = topValueFromMesh(dieA);
   const die2 = topValueFromMesh(dieB);
   const sum = die1 + die2;
@@ -648,14 +623,14 @@ function finishRoll(now) {
   const net = payout - bet;
   if (outcome === "win") {
     const mult = state.guess === "seven" ? "4x" : "2x";
-    showNotify(`WIN! +${fmtNrp(net)} (${mult} payout)`, "win");
+    showNotify(`WIN! +${fmtCredits(net)} (${mult} payout)`, "win");
     sounds.playWin();
     triggerConfetti();
   } else if (outcome === "push") {
     showNotify("PUSH! You guessed Higher/Lower and rolled 7. Full stake returned!", "info");
     sounds.playPush();
   } else {
-    showNotify(`LOSE. -${fmtNrp(Math.abs(net))}`, "lose");
+    showNotify(`LOSE. -${fmtCredits(Math.abs(net))}`, "lose");
     sounds.playLose();
     triggerLoseEffect();
   }
@@ -732,25 +707,28 @@ if (ui.rechargeBtn) {
     if (!Number.isFinite(amount) || amount <= 0) return showNotify("Enter a valid recharge amount.", "lose");
     state.bankroll += amount;
     syncUI();
-    showNotify(`Recharged +${fmtNrp(amount)} free credits!`, "win");
+    showNotify(`Recharged +${fmtCredits(amount)} free!`, "win");
   });
 }
 
-if (ui.guessHigherBtn) ui.guessHigherBtn.addEventListener("click", () => openGuessModal("higher"));
-if (ui.guessLowerBtn) ui.guessLowerBtn.addEventListener("click", () => openGuessModal("lower"));
-if (ui.guessSevenBtn) ui.guessSevenBtn.addEventListener("click", () => openGuessModal("seven"));
-if (ui.modalCancelBtn) ui.modalCancelBtn.addEventListener("click", closeGuessModal);
-if (ui.modalRollBtn) {
-  ui.modalRollBtn.addEventListener("click", () => {
-    const guess = state.pendingGuess;
-    const bet = Number(ui.modalBetInput.value);
-    if (!guess) return;
-    if (!validateBet(bet)) return;
-    ui.betInput.value = String(bet);
-    closeGuessModal();
-    startRoll(guess, bet);
-  });
+function getSelectedBet() {
+  const activeChip = document.querySelector('.chip-btn.active');
+  if (!activeChip) return MIN_BET;
+  const val = activeChip.dataset.val;
+  if (val === 'max') return state.bankroll;
+  return parseInt(val, 10) || MIN_BET;
 }
+
+document.querySelectorAll('.chip-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.chip-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+  });
+});
+
+if (ui.guessHigherBtn) ui.guessHigherBtn.addEventListener("click", () => startRoll("higher", getSelectedBet()));
+if (ui.guessLowerBtn) ui.guessLowerBtn.addEventListener("click", () => startRoll("lower", getSelectedBet()));
+if (ui.guessSevenBtn) ui.guessSevenBtn.addEventListener("click", () => startRoll("seven", getSelectedBet()));
 if (ui.resetBtn) ui.resetBtn.addEventListener("click", resetRound);
 
 // --------------------------------------------------------------------------

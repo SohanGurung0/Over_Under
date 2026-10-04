@@ -178,7 +178,7 @@
   <section class="hero-section" id="heroSection">
     <div class="hero-content">
       <div class="badge-pill">A free browser dice game, no download needed</div>
-      <h1 class="hero-title">Play Over7Under Online Free</h1>
+      <h1 class="hero-title">Over7Under: Predict the Dice</h1>
       <p class="hero-lead">
         Play Over7Under online for free. Make predictions, test your guessing skills, and enjoy a simple browser-based game with quick rounds and easy-to-understand gameplay.
       </p>
@@ -227,7 +227,7 @@
 
       <section id="homeScreen" class="screen">
         <div class="corner-hud">
-          <button id="shopBtn">Shop</button>
+          <button id="shopBtn">Refill credits</button>
         </div>
         <div class="home-bg-table"></div>
         <div class="home-card">
@@ -247,33 +247,26 @@
             <div id="rollHistory" class="roll-track">None</div>
           </div>
           <div class="controls">
-            <label for="betInput">Bet</label>
-            <input id="betInput" type="number" min="300" value="300" />
-            <button id="guessHigherBtn" class="guess-btn">Guess Higher</button>
-            <button id="guessLowerBtn" class="guess-btn">Guess Lower</button>
-            <button id="guessSevenBtn" class="guess-btn">Guess Exactly 7</button>
-            <button id="resetBtn">Reset</button>
-          </div>
-          <div id="guessModal" class="modal hidden">
-            <div class="modal-card">
-              <h3 id="modalTitle">Confirm Guess</h3>
-              <p id="modalBody">Roll with this guess?</p>
-              <div class="bet-row">
-                <label for="modalBetInput">Bet Amount</label>
-                <input id="modalBetInput" type="number" min="300" value="300" />
-              </div>
-              <div class="modal-actions">
-                <button id="modalCancelBtn">Cancel</button>
-                <button id="modalRollBtn">Roll</button>
-              </div>
+            <div class="free-play-badge">Free play • No real money</div>
+            <div class="chips-container">
+              <button type="button" class="chip-btn active" data-val="300">300</button>
+              <button type="button" class="chip-btn" data-val="500">500</button>
+              <button type="button" class="chip-btn" data-val="1000">1K</button>
+              <button type="button" class="chip-btn" data-val="max">Max</button>
             </div>
+            <div class="prediction-container">
+              <button id="guessHigherBtn" class="guess-btn">Higher</button>
+              <button id="guessSevenBtn" class="guess-btn">Exactly 7</button>
+              <button id="guessLowerBtn" class="guess-btn">Lower</button>
+            </div>
+            <button id="resetBtn">Reset</button>
           </div>
         </section>
       </section>
 
       <section id="shopScreen" class="screen hidden">
         <div class="shop-card">
-          <h2>Shop - Recharge Cash</h2>
+          <h2>Refill Credits</h2>
           <p>Add free play credits to your balance anytime.</p>
           <div class="shop-actions">
             <input id="rechargeInput" type="number" min="1" value="1000" />
@@ -285,7 +278,7 @@
 
       <div class="top-left-hud">
         <button id="exitToHomeBtn" class="back-circle" title="Home">↩</button>
-        <div id="bankrollText" class="bankroll-display">NRP 1000.00</div>
+        <div id="bankrollText" class="bankroll-display">1,000 credits</div>
       </div>
     </div>
   </section>
@@ -325,36 +318,22 @@
       <div class="step-box">
         <div class="step-num">1</div>
         <div class="step-body">
-          <h3>Check Your Current Number &amp; Bankroll</h3>
-          <p>Every session begins with 1,000 virtual credits. Review your available balance displayed in the top-left HUD indicator before placing a wager.</p>
+          <h3>Place Your Bet</h3>
+          <p>Select your chip amount and predict if the total will be Higher, Lower, or Exactly 7.</p>
         </div>
       </div>
       <div class="step-box">
         <div class="step-num">2</div>
         <div class="step-body">
-          <h3>Choose Over, Under, or Exactly 7</h3>
-          <p>Decide your prediction for the next roll. Predict <strong>Higher</strong> if you expect a sum between 8 and 12, <strong>Lower</strong> for a sum between 2 and 6, or <strong>Exactly 7</strong> for the pivot number.</p>
+          <h3>Watch the Roll</h3>
+          <p>Watch the 3D physics engine tumble the dice across the felt to reveal the sum.</p>
         </div>
       </div>
       <div class="step-box">
         <div class="step-num">3</div>
         <div class="step-body">
-          <h3>Submit Your Prediction</h3>
-          <p>Select your desired bet size (minimum 300 credits) and click your prediction button. Confirm your guess in the modal popup to initiate the turn.</p>
-        </div>
-      </div>
-      <div class="step-box">
-        <div class="step-num">4</div>
-        <div class="step-body">
-          <h3>View the 3D Result</h3>
-          <p>Watch the two dice spin, bounce, and settle on the felt table. The upper face values are read, summed together, and evaluated automatically.</p>
-        </div>
-      </div>
-      <div class="step-box">
-        <div class="step-num">5</div>
-        <div class="step-body">
-          <h3>Continue Playing &amp; Improve Your Score</h3>
-          <p>Collect payouts, watch your streak grow, and continue making thoughtful predictions to beat your highest personal bankroll record.</p>
+          <h3>Collect Winnings</h3>
+          <p>Earn 2x for correct Higher/Lower predictions, and a massive 4x payout for Exactly 7.</p>
         </div>
       </div>
     </div>
@@ -369,113 +348,120 @@
       <span class="subheading-tag">Rules &amp; Multipliers</span>
       <h2>Over7Under Game Rules</h2>
     </div>
-    <div class="seo-text-block">
-      <p>
-        Our online browser game adheres to authentic, transparent dice rules. The game uses two fair standard dice with outcomes totaling anywhere from 2 to 12. Here is exactly how rounds, predictions, and payouts work:
-      </p>
-    </div>
-
-    <div class="rules-card-grid">
-      <div class="rule-card">
-        <div class="rule-title-row">
-          <span class="rule-badge">Higher</span>
-          <h3>Guess Higher (Over 7)</h3>
+    <details class="faq-item">
+      <summary class="faq-question">
+        <h3>View Complete Rules &amp; Multipliers</h3>
+        <span class="faq-toggle">+</span>
+      </summary>
+      <div class="faq-answer">
+        <div class="seo-text-block">
+          <p>
+            Our online browser game adheres to authentic, transparent dice rules. The game uses two fair standard dice with outcomes totaling anywhere from 2 to 12. Here is exactly how rounds, predictions, and payouts work:
+          </p>
         </div>
-        <p><strong>Winning condition:</strong> Combined dice sum is <strong>8, 9, 10, 11, or 12</strong>.</p>
-        <p><strong>Payout:</strong> <strong>2x</strong> your bet (100% profit). For example, a 300 bet returns 600 credits.</p>
-        <p><strong>Push rule on 7:</strong> If the dice land on exactly 7, your 300 bet is safely refunded.</p>
-      </div>
-      <div class="rule-card highlight-card">
-        <div class="rule-title-row">
-          <span class="rule-badge gold">Exactly 7</span>
-          <h3>Guess Exactly 7</h3>
+
+        <div class="rules-card-grid">
+          <div class="rule-card">
+            <div class="rule-title-row">
+              <span class="rule-badge">Higher</span>
+              <h3>Guess Higher (Over 7)</h3>
+            </div>
+            <p><strong>Winning condition:</strong> Combined dice sum is <strong>8, 9, 10, 11, or 12</strong>.</p>
+            <p><strong>Payout:</strong> <strong>2x</strong> your bet (100% profit). For example, a 300 bet returns 600 credits.</p>
+            <p><strong>Push rule on 7:</strong> If the dice land on exactly 7, your bet is safely refunded.</p>
+          </div>
+          <div class="rule-card highlight-card">
+            <div class="rule-title-row">
+              <span class="rule-badge gold">Exactly 7</span>
+              <h3>Guess Exactly 7</h3>
+            </div>
+            <p><strong>Winning condition:</strong> Combined dice sum is <strong>exactly 7</strong>.</p>
+            <p><strong>Payout:</strong> <strong>4x</strong> your bet (300% profit). For example, a 300 bet returns 1,200 credits!</p>
+            <p><strong>Loss condition:</strong> Any roll other than 7 loses the wagered bet.</p>
+          </div>
+          <div class="rule-card">
+            <div class="rule-title-row">
+              <span class="rule-badge">Lower</span>
+              <h3>Guess Lower (Under 7)</h3>
+            </div>
+            <p><strong>Winning condition:</strong> Combined dice sum is <strong>2, 3, 4, 5, or 6</strong>.</p>
+            <p><strong>Payout:</strong> <strong>2x</strong> your bet (100% profit). For example, a 300 bet returns 600 credits.</p>
+            <p><strong>Push rule on 7:</strong> If the dice land on exactly 7, your bet is safely refunded.</p>
+          </div>
         </div>
-        <p><strong>Winning condition:</strong> Combined dice sum is <strong>exactly 7</strong>.</p>
-        <p><strong>Payout:</strong> <strong>4x</strong> your bet (300% profit). For example, a 300 bet returns 1,200 credits!</p>
-        <p><strong>Loss condition:</strong> Any roll other than 7 loses the wagered bet.</p>
-      </div>
-      <div class="rule-card">
-        <div class="rule-title-row">
-          <span class="rule-badge">Lower</span>
-          <h3>Guess Lower (Under 7)</h3>
+
+        <!-- Detailed Payout Summary Table -->
+        <div class="table-responsive">
+          <table class="data-table">
+            <thead>
+            <tr>
+              <th scope="col">Your Bet</th>
+              <th scope="col">Dice Result</th>
+              <th scope="col">Outcome</th>
+              <th scope="col">Example (300 Bet)</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+              <td>Higher</td>
+              <td>8, 9, 10, 11, 12</td>
+              <td><span class="status-badge win">Win (2x Payout)</span></td>
+              <td>Returns 600 (+300 profit)</td>
+            </tr>
+            <tr>
+              <td>Higher</td>
+              <td>7</td>
+              <td><span class="status-badge push">Push (Stake Returned)</span></td>
+              <td>Returns 300 (0 net change)</td>
+            </tr>
+            <tr>
+              <td>Higher</td>
+              <td>2, 3, 4, 5, 6</td>
+              <td><span class="status-badge lose">Loss</span></td>
+              <td>Returns 0 (-300 loss)</td>
+            </tr>
+            <tr>
+              <td>Lower</td>
+              <td>2, 3, 4, 5, 6</td>
+              <td><span class="status-badge win">Win (2x Payout)</span></td>
+              <td>Returns 600 (+300 profit)</td>
+            </tr>
+            <tr>
+              <td>Lower</td>
+              <td>7</td>
+              <td><span class="status-badge push">Push (Stake Returned)</span></td>
+              <td>Returns 300 (0 net change)</td>
+            </tr>
+            <tr>
+              <td>Lower</td>
+              <td>8, 9, 10, 11, 12</td>
+              <td><span class="status-badge lose">Loss</span></td>
+              <td>Returns 0 (-300 loss)</td>
+            </tr>
+            <tr>
+              <td>Exactly 7</td>
+              <td>7</td>
+              <td><span class="status-badge win">Win (4x Payout)</span></td>
+              <td>Returns 1200 (+900 profit)</td>
+            </tr>
+            <tr>
+              <td>Exactly 7</td>
+              <td>Any number other than 7</td>
+              <td><span class="status-badge lose">Loss</span></td>
+              <td>Returns 0 (-300 loss)</td>
+            </tr>
+            </tbody>
+          </table>
         </div>
-        <p><strong>Winning condition:</strong> Combined dice sum is <strong>2, 3, 4, 5, or 6</strong>.</p>
-        <p><strong>Payout:</strong> <strong>2x</strong> your bet (100% profit). For example, a 300 bet returns 600 credits.</p>
-        <p><strong>Push rule on 7:</strong> If the dice land on exactly 7, your 300 bet is safely refunded.</p>
+
+        <div class="push-callout">
+          <h4>Why the 7 Push Rule Matters</h4>
+          <p>
+            In standard dice mathematics, 7 is the single most common sum. By including a <strong>Push rule</strong> on Higher and Lower predictions, whenever 7 appears, you don't lose your stake—it returns straight back into your bankroll. This eliminates house advantage and creates a remarkably fair casual dynamic.
+          </p>
+        </div>
       </div>
-
-    </div>
-
-    <!-- Detailed Payout Summary Table -->
-    <div class="table-responsive">
-      <table class="data-table">
-        <thead>
-        <tr>
-          <th scope="col">Your Bet</th>
-          <th scope="col">Dice Result</th>
-          <th scope="col">Outcome</th>
-          <th scope="col">Example (300 Bet)</th>
-        </tr>
-        </thead>
-        <tbody>
-        <tr>
-          <td>Higher</td>
-          <td>8, 9, 10, 11, 12</td>
-          <td><span class="status-badge win">Win (2x Payout)</span></td>
-          <td>Returns 600 (+300 profit)</td>
-        </tr>
-        <tr>
-          <td>Higher</td>
-          <td>7</td>
-          <td><span class="status-badge push">Push (Stake Returned)</span></td>
-          <td>Returns 300 (0 net change)</td>
-        </tr>
-        <tr>
-          <td>Higher</td>
-          <td>2, 3, 4, 5, 6</td>
-          <td><span class="status-badge lose">Loss</span></td>
-          <td>Returns 0 (-300 loss)</td>
-        </tr>
-        <tr>
-          <td>Lower</td>
-          <td>2, 3, 4, 5, 6</td>
-          <td><span class="status-badge win">Win (2x Payout)</span></td>
-          <td>Returns 600 (+300 profit)</td>
-        </tr>
-        <tr>
-          <td>Lower</td>
-          <td>7</td>
-          <td><span class="status-badge push">Push (Stake Returned)</span></td>
-          <td>Returns 300 (0 net change)</td>
-        </tr>
-        <tr>
-          <td>Lower</td>
-          <td>8, 9, 10, 11, 12</td>
-          <td><span class="status-badge lose">Loss</span></td>
-          <td>Returns 0 (-300 loss)</td>
-        </tr>
-        <tr>
-          <td>Exactly 7</td>
-          <td>7</td>
-          <td><span class="status-badge win">Win (4x Payout)</span></td>
-          <td>Returns 1200 (+900 profit)</td>
-        </tr>
-        <tr>
-          <td>Exactly 7</td>
-          <td>Any number other than 7</td>
-          <td><span class="status-badge lose">Loss</span></td>
-          <td>Returns 0 (-300 loss)</td>
-        </tr>
-        </tbody>
-      </table>
-    </div>
-
-    <div class="push-callout">
-      <h4>Why the 7 Push Rule Matters to Players</h4>
-      <p>
-        In standard dice mathematics, 7 is the single most common sum. By including a <strong>Push rule</strong> on Higher and Lower predictions, whenever 7 appears, you don't lose your stake—it returns straight back into your bankroll. This eliminates house advantage and creates a remarkably fair casual dynamic.
-      </p>
-    </div>
+    </details>
 
     <div class="section-cta-row">
       <button class="btn btn-primary go-to-game-trigger">Roll Now</button>
@@ -494,99 +480,125 @@
       </p>
     </div>
 
-    <!-- Complete 36 Combinations Table -->
-    <div class="table-responsive">
-      <table class="data-table">
-        <thead>
-        <tr>
-          <th scope="col">Total Sum</th>
-          <th scope="col">Ways to Roll</th>
-          <th scope="col">Combinations</th>
-          <th scope="col">Exact Probability</th>
-          <th scope="col">Category</th>
-        </tr>
-        </thead>
-        <tbody>
-        <tr>
-          <td>2</td>
-          <td>1</td>
-          <td>(1,1)</td>
-          <td>2.78% (1/36)</td>
-          <td>Under 7</td>
-        </tr>
-        <tr>
-          <td>3</td>
-          <td>2</td>
-          <td>(1,2), (2,1)</td>
-          <td>5.56% (2/36)</td>
-          <td>Under 7</td>
-        </tr>
-        <tr>
-          <td>4</td>
-          <td>3</td>
-          <td>(1,3), (2,2), (3,1)</td>
-          <td>8.33% (3/36)</td>
-          <td>Under 7</td>
-        </tr>
-        <tr>
-          <td>5</td>
-          <td>4</td>
-          <td>(1,4), (2,3), (3,2), (4,1)</td>
-          <td>11.11% (4/36)</td>
-          <td>Under 7</td>
-        </tr>
-        <tr>
-          <td>6</td>
-          <td>5</td>
-          <td>(1,5), (2,4), (3,3), (4,2), (5,1)</td>
-          <td>13.89% (5/36)</td>
-          <td>Under 7</td>
-        </tr>
-        <tr class="highlight-row">
-          <td><strong>7</strong></td>
-          <td><strong>6</strong></td>
-          <td><strong>(1,6), (2,5), (3,4), (4,3), (5,2), (6,1)</strong></td>
-          <td><strong>16.67% (6/36)</strong></td>
-          <td><strong>Pivot (Exactly 7)</strong></td>
-        </tr>
-        <tr>
-          <td>8</td>
-          <td>5</td>
-          <td>(2,6), (3,5), (4,4), (5,3), (6,2)</td>
-          <td>13.89% (5/36)</td>
-          <td>Over 7</td>
-        </tr>
-        <tr>
-          <td>9</td>
-          <td>4</td>
-          <td>(3,6), (4,5), (5,4), (6,3)</td>
-          <td>11.11% (4/36)</td>
-          <td>Over 7</td>
-        </tr>
-        <tr>
-          <td>10</td>
-          <td>3</td>
-          <td>(4,6), (5,5), (6,4)</td>
-          <td>8.33% (3/36)</td>
-          <td>Over 7</td>
-        </tr>
-        <tr>
-          <td>11</td>
-          <td>2</td>
-          <td>(5,6), (6,5)</td>
-          <td>5.56% (2/36)</td>
-          <td>Over 7</td>
-        </tr>
-        <tr>
-          <td>12</td>
-          <td>1</td>
-          <td>(6,6)</td>
-          <td>2.78% (1/36)</td>
-          <td>Over 7</td>
-        </tr>
-        </tbody>
-      </table>
+    <!-- Probability Chart Visual -->
+    <div class="probability-chart-container">
+      <div class="prob-chart">
+        <div class="prob-bar-group"><div class="prob-bar" style="height: 16.7%"></div><span>2</span></div>
+        <div class="prob-bar-group"><div class="prob-bar" style="height: 33.3%"></div><span>3</span></div>
+        <div class="prob-bar-group"><div class="prob-bar" style="height: 50.0%"></div><span>4</span></div>
+        <div class="prob-bar-group"><div class="prob-bar" style="height: 66.7%"></div><span>5</span></div>
+        <div class="prob-bar-group"><div class="prob-bar" style="height: 83.3%"></div><span>6</span></div>
+        <div class="prob-bar-group pivot"><div class="prob-bar" style="height: 100.0%"></div><span>7</span></div>
+        <div class="prob-bar-group"><div class="prob-bar" style="height: 83.3%"></div><span>8</span></div>
+        <div class="prob-bar-group"><div class="prob-bar" style="height: 66.7%"></div><span>9</span></div>
+        <div class="prob-bar-group"><div class="prob-bar" style="height: 50.0%"></div><span>10</span></div>
+        <div class="prob-bar-group"><div class="prob-bar" style="height: 33.3%"></div><span>11</span></div>
+        <div class="prob-bar-group"><div class="prob-bar" style="height: 16.7%"></div><span>12</span></div>
+      </div>
+      <p class="chart-caption">Dice Sum Distribution</p>
     </div>
+
+    <!-- Complete 36 Combinations Table -->
+    <details class="faq-item">
+      <summary class="faq-question">
+        <h3>View Exact Combinations &amp; Probabilities</h3>
+        <span class="faq-toggle">+</span>
+      </summary>
+      <div class="faq-answer">
+        <div class="table-responsive">
+          <table class="data-table">
+            <thead>
+            <tr>
+              <th scope="col">Total Sum</th>
+              <th scope="col">Ways to Roll</th>
+              <th scope="col">Combinations</th>
+              <th scope="col">Exact Probability</th>
+              <th scope="col">Category</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+              <td>2</td>
+              <td>1</td>
+              <td>(1,1)</td>
+              <td>2.78% (1/36)</td>
+              <td>Under 7</td>
+            </tr>
+            <tr>
+              <td>3</td>
+              <td>2</td>
+              <td>(1,2), (2,1)</td>
+              <td>5.56% (2/36)</td>
+              <td>Under 7</td>
+            </tr>
+            <tr>
+              <td>4</td>
+              <td>3</td>
+              <td>(1,3), (2,2), (3,1)</td>
+              <td>8.33% (3/36)</td>
+              <td>Under 7</td>
+            </tr>
+            <tr>
+              <td>5</td>
+              <td>4</td>
+              <td>(1,4), (2,3), (3,2), (4,1)</td>
+              <td>11.11% (4/36)</td>
+              <td>Under 7</td>
+            </tr>
+            <tr>
+              <td>6</td>
+              <td>5</td>
+              <td>(1,5), (2,4), (3,3), (4,2), (5,1)</td>
+              <td>13.89% (5/36)</td>
+              <td>Under 7</td>
+            </tr>
+            <tr class="highlight-row">
+              <td><strong>7</strong></td>
+              <td><strong>6</strong></td>
+              <td><strong>(1,6), (2,5), (3,4), (4,3), (5,2), (6,1)</strong></td>
+              <td><strong>16.67% (6/36)</strong></td>
+              <td><strong>Pivot (Exactly 7)</strong></td>
+            </tr>
+            <tr>
+              <td>8</td>
+              <td>5</td>
+              <td>(2,6), (3,5), (4,4), (5,3), (6,2)</td>
+              <td>13.89% (5/36)</td>
+              <td>Over 7</td>
+            </tr>
+            <tr>
+              <td>9</td>
+              <td>4</td>
+              <td>(3,6), (4,5), (5,4), (6,3)</td>
+              <td>11.11% (4/36)</td>
+              <td>Over 7</td>
+            </tr>
+            <tr>
+              <td>10</td>
+              <td>3</td>
+              <td>(4,6), (5,5), (6,4)</td>
+              <td>8.33% (3/36)</td>
+              <td>Over 7</td>
+            </tr>
+            <tr>
+              <td>11</td>
+              <td>2</td>
+              <td>(5,6), (6,5)</td>
+              <td>5.56% (2/36)</td>
+              <td>Over 7</td>
+            </tr>
+            <tr>
+              <td>12</td>
+              <td>1</td>
+              <td>(6,6)</td>
+              <td>2.78% (1/36)</td>
+              <td>Over 7</td>
+            </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </details>
 
     <div class="tips-grid">
       <div class="tip-card">
@@ -619,7 +631,7 @@
       <h2>Frequently Asked Questions</h2>
     </div>
     <div class="faq-list">
-      <details class="faq-item" open>
+      <details class="faq-item">
         <summary class="faq-question">
           <h3>What is Over7Under?</h3>
           <span class="faq-toggle">+</span>
@@ -629,7 +641,7 @@
         </div>
       </details>
 
-      <details class="faq-item" open>
+      <details class="faq-item">
         <summary class="faq-question">
           <h3>How do you play Over7Under?</h3>
           <span class="faq-toggle">+</span>
@@ -639,7 +651,7 @@
         </div>
       </details>
 
-      <details class="faq-item" open>
+      <details class="faq-item">
         <summary class="faq-question">
           <h3>Is Over7Under free to play?</h3>
           <span class="faq-toggle">+</span>

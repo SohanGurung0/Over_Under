@@ -591,9 +591,9 @@ canvas#sceneCanvas {
   right: 16px;
   bottom: 16px;
   z-index: 11;
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
-  gap: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
   background: rgba(10, 8, 6, 0.88);
   border: 1px solid rgba(243, 234, 217, 0.15);
   border-radius: var(--radius-md);
@@ -601,23 +601,46 @@ canvas#sceneCanvas {
   backdrop-filter: blur(8px);
 }
 
-.controls label {
-  grid-column: 1 / -1;
-  font-size: 0.85rem;
-  font-weight: 700;
-  color: var(--text-muted);
+.free-play-badge {
+  text-align: center;
+  font-size: 0.8rem;
+  color: var(--accent-brass);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: -4px;
 }
 
-#betInput {
-  grid-column: 1 / -1;
-  width: 100%;
-  background: rgba(15, 23, 42, 0.9);
+.chips-container {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+}
+
+.chip-btn {
+  flex: 1;
+  background: #120e0a;
   border: 1px solid rgba(243, 234, 217, 0.2);
-  border-radius: var(--radius-sm);
-  color: #fff;
-  font-size: 1.1rem;
+  color: var(--text-muted);
+  border-radius: var(--radius-chip);
+  padding: 10px 12px;
+  font-size: 1rem;
   font-weight: 700;
-  padding: 10px 14px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  min-height: 44px;
+}
+
+.chip-btn.active {
+  background: var(--accent-brass);
+  color: #120e0a;
+  border-color: var(--accent-brass-bright);
+}
+
+.prediction-container {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
 }
 
 button, input {
@@ -631,6 +654,7 @@ button, input {
   border: 1px solid var(--wood-dark);
   border-radius: var(--radius-sm);
   padding: 12px 14px;
+  min-height: 48px;
   cursor: pointer;
   box-shadow: var(--shadow-tactile);
   transition: transform 0.15s ease, box-shadow 0.15s ease, filter 0.15s ease;
@@ -1545,4 +1569,131 @@ button, input {
     font-size: 0.7rem;
     padding: 4px 10px;
   }
+}
+
+/* ==========================================================================
+   FAQ Accordion
+   ========================================================================== */
+.faq-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 20px;
+}
+
+.faq-item {
+  background: rgba(20, 17, 12, 0.7);
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+
+.faq-item:hover {
+  background: rgba(30, 25, 18, 0.9);
+  border-color: var(--accent-brass);
+}
+
+.faq-question {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  cursor: pointer;
+  list-style: none; /* Hide default arrow */
+  user-select: none;
+}
+
+.faq-question::-webkit-details-marker {
+  display: none; /* Hide default arrow in webkit */
+}
+
+.faq-question h3 {
+  font-family: var(--font-sans);
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin: 0;
+  color: var(--text-primary);
+}
+
+.faq-toggle {
+  font-size: 1.5rem;
+  color: var(--accent-brass);
+  font-weight: 400;
+  line-height: 1;
+  transition: transform 0.3s ease;
+}
+
+.faq-item[open] .faq-toggle {
+  transform: rotate(45deg);
+}
+
+.faq-answer {
+  padding: 0 20px 20px;
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+  line-height: 1.6;
+}
+
+/* ==========================================================================
+   Probability Chart
+   ========================================================================== */
+.probability-chart-container {
+  margin: 30px 0;
+  padding: 20px;
+  background: rgba(10, 8, 6, 0.5);
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius-md);
+}
+
+.prob-chart {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  height: 120px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid rgba(243, 234, 217, 0.15);
+  margin-bottom: 10px;
+}
+
+.prob-bar-group {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex: 1;
+  height: 100%;
+  justify-content: flex-end;
+  gap: 6px;
+}
+
+.prob-bar {
+  width: 60%;
+  min-width: 8px;
+  max-width: 24px;
+  background: var(--accent-brass);
+  border-radius: 4px 4px 0 0;
+  opacity: 0.8;
+}
+
+.prob-bar-group.pivot .prob-bar {
+  background: var(--accent-brass-bright);
+  opacity: 1;
+}
+
+.prob-bar-group span {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--text-muted);
+}
+
+.prob-bar-group.pivot span {
+  color: var(--accent-brass-bright);
+}
+
+.chart-caption {
+  text-align: center;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  margin: 0;
+  font-style: italic;
 }
